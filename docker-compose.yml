@@ -1,0 +1,9 @@
+# Convenience wrapper around `docker run` — lets you start the API with a
+# single `docker compose up` instead of remembering the full docker run command
+# with port mapping flags every time.
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

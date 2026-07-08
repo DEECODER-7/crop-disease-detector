@@ -1,0 +1,27 @@
+# Core ML
+torch>=2.2.0
+torchvision>=0.17.0
+numpy>=1.26.0
+scikit-learn>=1.4.0
+
+# Data handling
+pandas>=2.2.0
+pillow>=10.2.0
+kagglehub>=0.2.0
+
+# API (Stage 4)
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+
+# UI (Stage 8)
+streamlit>=1.32.0
+requests>=2.31.0
+
+# Evaluation / plotting
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# Testing (Stage 6)
+pytest>=8.0.0
+httpx>=0.27.0

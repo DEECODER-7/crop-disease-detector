@@ -1,0 +1,24 @@
+# Never send the training data into the Docker build context — it's multiple
+# GB and the image doesn't need it (only the trained checkpoint matters).
+data/
+
+# Local environment / editor / cache junk
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.idea/
+.vscode/
+.git/
+.gitignore
+
+# Training-only artifacts not needed in the API image
+notebooks/
+tests/
+checkpoints/confusion_matrix.png
+checkpoints/classification_report.txt
+
+# Keep the two files we DO need from checkpoints — Docker's COPY in the
+# Dockerfile explicitly grabs best_model.pth and class_names.json directly,
+# so excluding the rest here just avoids sending extra unneeded files.

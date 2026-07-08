@@ -1,0 +1,18 @@
+# Only what the API needs to run inference — NOT the full requirements.txt.
+# Training-only tools (matplotlib, seaborn, scikit-learn, kagglehub, pytest)
+# don't belong in a production image: they bloat the image size and increase
+# the attack surface for no benefit once the model is already trained.
+#
+# Also note: this installs the CPU-only build of torch, which is a small
+# fraction of the size of the full CUDA build. Since this API just runs
+# inference on single images (not training), CPU is fine and keeps the
+# Docker image lean — this is exactly the kind of size-vs-need tradeoff an
+# interviewer might ask you to justify.
+
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+pillow>=10.2.0
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.2.0
+torchvision>=0.17.0
