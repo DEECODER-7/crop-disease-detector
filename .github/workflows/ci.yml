@@ -25,7 +25,7 @@ jobs:
           pip install pytest httpx
 
       - name: Generate dummy checkpoint for testing
-        run: python scripts/create_dummy_checkpoint.py
+        run: python -m scripts.create_dummy_checkpoint
 
       - name: Run tests
         run: pytest tests/ -v
