@@ -9,11 +9,13 @@ Then open http://localhost:8000/docs for interactive API documentation
 """
 
 import io
+import time
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from PIL import Image, UnidentifiedImageError
 
 from src.api.inference import DiseasePredictor
+from src.api.monitoring import get_metrics, record_prediction
 from src.api.schemas import ClassPrediction, HealthResponse, PredictionResponse
 
 app = FastAPI(
@@ -33,7 +35,7 @@ ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/jpg", "image/webp"}
 @app.get("/health", response_model=HealthResponse)
 def health_check():
     """
-    Basic liveness/readiness check. Cloud platforms and load balancers (Stage 7)
+    Basic liveness/readiness check. Cloud platforms and load balancers
     ping this endpoint to know whether the service is up and the model is
     actually loaded before routing real traffic to it.
     """
@@ -66,8 +68,16 @@ async def predict(file: UploadFile = File(...)):
     except UnidentifiedImageError:
         raise HTTPException(status_code=400, detail="Could not read file as an image.")
 
+    start_time = time.perf_counter()
     predictions = predictor.predict(image, top_k=3)
+    latency_ms = (time.perf_counter() - start_time) * 1000
+
     top_class, top_confidence = predictions[0]
+
+    # Record this prediction for the /metrics endpoint. Deliberately done
+    # AFTER the response is computed so a monitoring bug can never break
+    # or slow down an actual prediction request.
+    record_prediction(predicted_class=top_class, confidence=top_confidence, latency_ms=latency_ms)
 
     return PredictionResponse(
         predicted_class=top_class,
@@ -76,3 +86,13 @@ async def predict(file: UploadFile = File(...)):
             ClassPrediction(class_name=name, confidence=conf) for name, conf in predictions
         ],
     )
+
+
+@app.get("/metrics")
+def metrics():
+    """
+    Basic operational metrics: request volume, average latency/confidence,
+    and which classes are being predicted most often. See monitoring.py for
+    the honest caveat that this is in-memory only (resets on restart).
+    """
+    return get_metrics()

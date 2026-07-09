@@ -29,3 +29,12 @@ def test_predict_rejects_corrupt_image_bytes():
     fake_file = ("fake.jpg", b"definitely not real jpeg bytes", "image/jpeg")
     response = client.post("/predict", files={"file": fake_file})
     assert response.status_code == 400
+
+
+def test_metrics_endpoint_returns_expected_shape():
+    response = client.get("/metrics")
+    assert response.status_code == 200
+    body = response.json()
+    assert "total_requests_since_start" in body
+    assert "average_latency_ms" in body
+    assert "class_distribution" in body
