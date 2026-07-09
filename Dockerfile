@@ -28,4 +28,4 @@ EXPOSE 8000
 
 # Bind to 0.0.0.0, not 127.0.0.1 — inside a container, the API must accept
 # connections from outside the container itself, not just localhost within it.
-CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn src.api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
